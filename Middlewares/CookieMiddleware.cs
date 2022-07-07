@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using WebServer.Service;
+using WebServer.Middlewares.Interfaces;
+using WebServer.Models;
+using WebServer.Service.Interfaces;
 using WebServer.Storage;
 
 namespace WebServer.Middlewares

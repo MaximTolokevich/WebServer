@@ -1,4 +1,5 @@
 ﻿using System;
+using WebServer.Service.Interfaces;
 
 namespace WebServer.Service
 {

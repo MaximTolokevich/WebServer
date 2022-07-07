@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
 namespace WebServer.Clients
 {
-    public class TcpClientAdapter : IClient, IDisposable
+    public class TcpClientAdapter : IClient
     {
         private readonly TcpClient _tcpClient;
         private readonly ServerOptions _options;
+        private bool _disposedValue;
         public TcpClientAdapter(TcpClient client, ServerOptions options)
         {
             _tcpClient = client;
@@ -17,10 +17,22 @@ namespace WebServer.Clients
         }
 
 
-
         public void Dispose()
         {
-            _tcpClient.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            switch (_disposedValue)
+            {
+                case true:
+                    return;
+                case false:
+                    _disposedValue = true;
+                    _tcpClient.Close();
+                    break;
+            }
         }
 
         public IPAddress GetClientInfo()
@@ -30,7 +42,7 @@ namespace WebServer.Clients
         }
         public byte[] ReadRequest()
         {
-             var stream = _tcpClient.GetStream();
+            var stream = _tcpClient.GetStream();
             var buffer = new byte[8192];
             var data = new List<byte>();
             stream.ReadTimeout = _options.ReadTimeOut;

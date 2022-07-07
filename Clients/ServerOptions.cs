@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WebServer.Clients
+﻿namespace WebServer.Clients
 {
     public class ServerOptions
     {
@@ -12,6 +6,9 @@ namespace WebServer.Clients
         public int ReadTimeOut { get; set; }
         public int Port { get; set; }
         public string IpAddress { get; set; }
+        public string DependencyGroupName { get; set; }
+        public (int,int) SetMaxThreads { get; set; }
+        public (int,int) SetMinThreads { get; set; }
 
         public ServerOptions()
         {

@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using WebServer.Clients;
+using WebServer.HttpRequestReaders;
 using WebServer.Middlewares;
+using WebServer.Middlewares.Interfaces;
+using WebServer.Models;
+using WebServer.Service.Interfaces;
 
 namespace WebServer.Service
 {
@@ -8,8 +13,8 @@ namespace WebServer.Service
     {
         private readonly IHttpRequestReader _httpRequestReader;
         private readonly ServerOptions _options;
-        private readonly MiddlewareList _middlewareList;
-        public HttpManager(IHttpRequestReader requestReader, ServerOptions options, MiddlewareList middleware)
+        private readonly ICollection<IMiddleware> _middlewareList;
+        public HttpManager(IHttpRequestReader requestReader, ServerOptions options, ICollection<IMiddleware> middleware)
         {
             _options = options;
             _httpRequestReader = requestReader;
@@ -24,12 +29,14 @@ namespace WebServer.Service
                 {
                     HttpRequest = httpRequest
                 };
+
                 httpContext.HttpRequest.Headers.Add("IPAddress", client.GetClientInfo().ToString());
 
-                foreach (var item in _middlewareList.Middlewares)
+                foreach (var item in _middlewareList)
                 {
                     item.Invoke(httpContext);
                 }
+
                 client.SendResponse(httpContext.HttpResponse.Build());
             }
             catch (Exception e)

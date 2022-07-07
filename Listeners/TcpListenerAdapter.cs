@@ -11,9 +11,14 @@ namespace WebServer.Listeners
         private readonly ServerOptions _options;
         public TcpListenerAdapter(ServerOptions options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options), "can't be null");
+            }
+
             if (!IPAddress.TryParse(options.IpAddress, out var address))
             {
-                throw new ArgumentException("is not valid", nameof(_options.IpAddress));
+                throw new ArgumentException("is not valid", nameof(options.IpAddress));
             }
 
             if (options.Port is > IPEndPoint.MaxPort or < IPEndPoint.MinPort)

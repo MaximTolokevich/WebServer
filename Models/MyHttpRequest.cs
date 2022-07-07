@@ -14,7 +14,7 @@ namespace WebServer.Models
         public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
         public byte[] Body { get; set; }
 
-        public MyHttpRequest Build(byte[] data)
+        public static MyHttpRequest Build(byte[] data)
         {
             if (!data.Any())
             {
@@ -22,6 +22,7 @@ namespace WebServer.Models
             }
             var indexFirsPairEnvNewLine = FindFirstPairEnvironmentNewLine(data);
             string requestWithoutBody;
+            var body = Array.Empty<byte>();
             if (indexFirsPairEnvNewLine >0)
             {
                 var bytesToSkip = 3;
@@ -30,7 +31,7 @@ namespace WebServer.Models
                     bytesToSkip = 1;
                 }
                 requestWithoutBody = Encoding.UTF8.GetString(data[..indexFirsPairEnvNewLine]);
-                Body = data[(indexFirsPairEnvNewLine + bytesToSkip + 1)..];
+                body = data[(indexFirsPairEnvNewLine + bytesToSkip + 1)..];
             }
             else
             {
@@ -62,6 +63,7 @@ namespace WebServer.Models
                 Uri = uri,
                 Version = version,
                 Headers = headers,
+                Body = body,
             };
         }
 

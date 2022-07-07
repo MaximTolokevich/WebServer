@@ -1,7 +1,7 @@
 ﻿using WebServer.Clients;
 using WebServer.Models;
 
-namespace WebServer.Service
+namespace WebServer.HttpRequestReaders
 {
     public interface IHttpRequestReader
     {

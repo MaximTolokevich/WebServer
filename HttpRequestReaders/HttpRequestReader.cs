@@ -10,7 +10,7 @@ namespace WebServer.HttpRequestReaders
     {
         public MyHttpRequest Read(IClient client)
         {
-            var httpRequest = new MyHttpRequest().Build(client.ReadRequest());
+            var httpRequest = MyHttpRequest.Build(client.ReadRequest());
             if (httpRequest.Headers.ContainsKey("Content-Length"))
             {
                 var isSuccess = int.TryParse(httpRequest.Headers["Content-Length"], out var length);

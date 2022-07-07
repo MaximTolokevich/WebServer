@@ -1,19 +1,24 @@
 ﻿using System.Threading;
 using WebServer.Clients;
+using WebServer.DI;
+using WebServer.DI.Interfaces;
 using WebServer.Listeners;
 using WebServer.Service;
+using WebServer.Service.Interfaces;
 
 namespace WebServer
 {
-    public class Server:IServer
+    public class Server : IServer
     {
         private readonly IListener _listener;
-        private readonly IManager _manager;
+        private readonly IDIContainer _container;
+        private readonly ServerOptions _options;
         private bool _isRunning = true;
-        public Server(IListener listener, IManager manager)
+        public Server(IListener listener, IDIContainer container, ServerOptions options)
         {
             _listener = listener;
-            _manager = manager;
+            _container = container;
+            _options = options;
         }
 
         public void Start()
@@ -36,11 +41,12 @@ namespace WebServer
                 client = _listener.AcceptClient();
                 if (client is not null)
                 {
-                    using (client)
+                    if (_options is not null)
                     {
-                        _manager.Manage(client);
+                        ThreadPool.SetMinThreads(_options.SetMinThreads.Item1, _options.SetMinThreads.Item2);
+                        ThreadPool.SetMaxThreads(_options.SetMaxThreads.Item1, _options.SetMaxThreads.Item2);
                     }
-                    //ThreadPool.QueueUserWorkItem(HandleClient, client);
+                    ThreadPool.QueueUserWorkItem(HandleClient, client);
                 }
 
                 return !_isRunning;
@@ -51,7 +57,16 @@ namespace WebServer
 
         private void HandleClient(object obj)
         {
-            _manager.Manage(obj as IClient);
+            using var client = obj as IClient;
+
+            if (_options.DependencyGroupName is null)
+            {
+                _container.GetService<IManager>().Manage(client);
+            }
+            else
+            {
+                _container.GetService<IManager>(_options.DependencyGroupName).Manage(client);
+            }
         }
     }
 }

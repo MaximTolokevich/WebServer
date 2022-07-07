@@ -1,7 +1,6 @@
 ﻿using WebServer.Clients;
-using WebServer.Models;
 
-namespace WebServer.Service
+namespace WebServer.Models
 {
      public class MyHttpContext
     {

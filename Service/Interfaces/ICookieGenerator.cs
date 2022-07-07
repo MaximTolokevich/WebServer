@@ -1,4 +1,4 @@
-﻿namespace WebServer.Service
+﻿namespace WebServer.Service.Interfaces
 {
     public interface ICookieGenerator
     {
