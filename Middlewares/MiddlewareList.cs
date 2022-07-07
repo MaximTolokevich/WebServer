@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using WebServer.Middlewares.Interfaces;
 
 namespace WebServer.Middlewares
 {
-    public class MiddlewareList
+    public class MiddlewareList : IMiddlewareCollection
     {
-        public List<IMiddleware> Middlewares = new();
+        public ICollection<IMiddleware> GetMiddlewares()
+        {
+            return new List<IMiddleware>();
+        }
     }
 }

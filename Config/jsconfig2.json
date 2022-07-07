@@ -1,0 +1,15 @@
+{
+  "ServerName": "SecondServer",
+  "ReadTimeOut": 300,
+  "Port": 9090,
+  "IpAddress": "127.0.0.1",
+  "DependencyGroupName": "SecondServer",
+  "SetMaxThreads": {
+    "workerThreads": 8,
+    "completionPortThreads": 8
+  },
+  "SetMinThreads": {
+    "workerThreads": 8,
+    "completionPortThreads": 8
+  }
+}

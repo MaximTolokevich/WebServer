@@ -1,64 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using WebServer.DI.Interfaces;
 
 namespace WebServer.DI
 {
-    public class MyServiceCollection
+    public class MyServiceCollection:IServiceCollection
     {
-        private readonly List<MyServiceProvider> serviceProviders = new();
+        private readonly List<MyServiceProvider> _serviceProviders = new();
 
+        public void Add<TInterface>(object obj)
+        {
+            CheckIsInterfaceType(typeof(TInterface));
+            _serviceProviders.Add(new MyServiceProvider(obj, typeof(TInterface)));
+        }
+        public void Add<TInterface>(object obj, string name)
+        {
+            CheckIsInterfaceType(typeof(TInterface));
+            _serviceProviders.Add(new MyServiceProvider(obj, typeof(TInterface), name));
+        }
         public void Add(object obj)
         {
-            serviceProviders.Add(new MyServiceProvider(obj));
+            _serviceProviders.Add(new MyServiceProvider(obj));
+        }
+        public void Add(object obj, string name)
+        {
+            _serviceProviders.Add(new MyServiceProvider(obj, name));
         }
 
-        public void AddSingleton<T>()
+        public void AddSingleton<TImplementation>()
         {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), ServiceLifeTime.Singleton));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TImplementation), ServiceLifeTime.Singleton));
         }
-        public void AddSingleton<T, V>()
+        public void AddSingleton<TInterface, TImplementation>()
         {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), typeof(V), ServiceLifeTime.Singleton));
-        }
-
-        public void AddTransient<T>()
-        {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), ServiceLifeTime.Transient));
+            CheckIsInterfaceType(typeof(TInterface));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Singleton));
         }
 
-        public void AddTransient<T, V>()
+        public void AddTransient<TImplementation>()
         {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), typeof(V), ServiceLifeTime.Transient));
-        }
-        public void AddWithName(object obj,string name)
-        {
-            serviceProviders.Add(new MyServiceProvider(obj, name));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TImplementation), ServiceLifeTime.Transient));
         }
 
-        public void AddSingletonWithName<T>(string name)
+        public void AddTransient<TInterface, TImplementation>()
         {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), ServiceLifeTime.Singleton, name));
+            CheckIsInterfaceType(typeof(TInterface));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Transient));
         }
-        public void AddSingletonWithName<T, V>(string name)
+        public void AddWithName<TInterface>(object obj, string name)
         {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), typeof(V), ServiceLifeTime.Singleton, name));
+            CheckIsInterfaceType(typeof(TInterface));
+            _serviceProviders.Add(new MyServiceProvider(obj, typeof(TInterface), name));
+        }
+        public void AddWithName(object obj, string name)
+        {
+            _serviceProviders.Add(new MyServiceProvider(obj, name));
         }
 
-        public void AddTransientWithName<T>(string name)
+        public void AddSingletonWithName<TImplementation>(string name)
         {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), ServiceLifeTime.Transient, name));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TImplementation), ServiceLifeTime.Singleton, name));
+        }
+        public void AddSingletonWithName<TInterface, TImplementation>(string name)
+        {
+            CheckIsInterfaceType(typeof(TInterface));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Singleton, name));
         }
 
-        public void AddTransientWithName<T, V>(string name)
+        public void AddTransientWithName<TImplementation>(string name)
         {
-            serviceProviders.Add(new MyServiceProvider(typeof(T), typeof(V), ServiceLifeTime.Transient, name));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TImplementation), ServiceLifeTime.Transient, name));
+        }
+
+        public void AddTransientWithName<TInterface, TImplementation>(string name)
+        {
+            CheckIsInterfaceType(typeof(TInterface));
+            CheckIsConcreteClassType(typeof(TImplementation));
+            _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Transient, name));
+        }
+
+        private static void CheckIsInterfaceType(Type type)
+        {
+            if (!type.IsInterface)
+            {
+                throw new ArgumentException("Should be Interface type", nameof(type));
+            }
+        }
+        private static void CheckIsConcreteClassType(Type type)
+        {
+            if (!type.IsClass || type.IsAbstract || type.IsEnum)
+            {
+                throw new ArgumentException("Should be concrete class type", nameof(type));
+            }
         }
         public MyContainer BuildContainer()
         {
-            return new MyContainer(serviceProviders);
+            return new MyContainer(_serviceProviders);
         }
     }
 }
