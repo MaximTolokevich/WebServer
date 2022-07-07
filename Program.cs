@@ -39,7 +39,7 @@ namespace WebServer
             col.AddTransientWithName<ICookieGenerator, CookieGenerator>(firstServer);
             col.AddTransientWithName<IHttpRequestReader,HttpRequestReader>(firstServer);
 
-            //registering dependencies of the first server
+            //registering dependencies of the second server
             col.AddSingletonWithName<IServer, Server>(secondServer);
             col.AddSingletonWithName<IListener, TcpListenerAdapter>(secondServer);
             col.AddSingletonWithName<CookieStorage>(secondServer);
