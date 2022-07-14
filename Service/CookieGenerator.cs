@@ -7,7 +7,7 @@ namespace WebServer.Service
     {
         public string GenerateCookie() 
         {
-            return  Guid.NewGuid().ToString();
+            return  $"{Guid.NewGuid()}={Guid.NewGuid()}";
         }
     }
 }

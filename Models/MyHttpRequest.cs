@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using WebServer.Clients;
 using WebServer.Exceptions;
 
 namespace WebServer.Models
@@ -14,7 +15,7 @@ namespace WebServer.Models
         public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
         public byte[] Body { get; set; }
 
-        public static MyHttpRequest Build(byte[] data)
+        public static MyHttpRequest Build(byte[] data, ServerOptions options)
         {
             if (!data.Any())
             {
@@ -41,7 +42,7 @@ namespace WebServer.Models
             var splitedRequest = requestWithoutBody.Split(Environment.NewLine);
             var firstLineRequest = splitedRequest[0];
             var firstLineSplit = firstLineRequest.Split(' ');
-
+            var method = firstLineSplit[0];
             var version = firstLineSplit[^1];
             var headers = new Dictionary<string, string>();
             
@@ -54,12 +55,14 @@ namespace WebServer.Models
             var uri = new Uri(firstLineSplit[1], UriKind.RelativeOrAbsolute);
             var baseUri = new UriBuilder()
             {
-                Scheme = Uri.UriSchemeHttp
+                Scheme = Uri.UriSchemeHttp,
+                Port = options.Port
             };
 
              uri = new Uri(baseUri.Uri, uri);
             return new MyHttpRequest
             {
+                Method = method,
                 Uri = uri,
                 Version = version,
                 Headers = headers,

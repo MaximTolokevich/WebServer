@@ -8,26 +8,35 @@ namespace WebServer.DI
 {
     public class MyContainer : IDIContainer
     {
-        public MyContainer(List<MyServiceProvider> serviceProviders)
+        public MyContainer(IList<MyServiceProvider> serviceProviders)
         {
             _serviceProviders = serviceProviders;
         }
 
-        private readonly List<MyServiceProvider> _serviceProviders;
+        private readonly IList<MyServiceProvider> _serviceProviders;
 
         private object GetService(Type serviceType)
         {
             if (serviceType.IsInterface)
             {
-                var provider = _serviceProviders.FirstOrDefault(x => x.InterfaceType == serviceType);
+                var provider = _serviceProviders.LastOrDefault(x => x.InterfaceType == serviceType);
 
                 CheckProviderExist(provider,serviceType);
+                if (provider.Implementation is not null)
+                {
+                    return provider.Implementation;
+                }
+                var impl = CreateInstance(provider.ImplType, GetConstructorParameters(provider));
+                if (provider.LifeTime is ServiceLifeTime.Singleton)
+                {
+                    provider.Implementation = impl;
+                }
 
-                return provider.Implementation ?? CreateInstance(provider.ImplType, GetConstructorParameters(provider));
+                return impl;
             }
             else
             {
-                var provider = _serviceProviders.FirstOrDefault(x => x.ImplType == serviceType);
+                var provider = _serviceProviders.LastOrDefault(x => x.ImplType == serviceType);
 
                 CheckProviderExist(provider, serviceType);
 
@@ -57,7 +66,7 @@ namespace WebServer.DI
         {
             if (serviceType.IsInterface)
             {
-                var provider = _serviceProviders.FirstOrDefault(x => x.InterfaceType == serviceType && x.DependencyName.Equals(name));
+                var provider = _serviceProviders.LastOrDefault(x => x.InterfaceType == serviceType && x.DependencyName.Equals(name));
                 
                 CheckProviderWithNameExist(provider, serviceType, name);
 
@@ -77,7 +86,7 @@ namespace WebServer.DI
             }
             else
             {
-                var provider = _serviceProviders.FirstOrDefault(x => x.ImplType == serviceType && x.DependencyName.Equals(name));
+                var provider = _serviceProviders.LastOrDefault(x => x.ImplType == serviceType && x.DependencyName.Equals(name));
                 
                 CheckProviderWithNameExist(provider, serviceType, name);
 

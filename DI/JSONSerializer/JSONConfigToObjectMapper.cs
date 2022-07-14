@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json;
 
-namespace WebServer.JSONSerializer
+namespace WebServer.DI.JSONSerializer
 {
     public class JSONConfigToObjectMapper
     {

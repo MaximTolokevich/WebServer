@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using WebServer.Clients;
 using WebServer.HttpRequestReaders;
-using WebServer.Middlewares;
 using WebServer.Middlewares.Interfaces;
 using WebServer.Models;
 using WebServer.Service.Interfaces;
@@ -16,9 +15,9 @@ namespace WebServer.Service
         private readonly ICollection<IMiddleware> _middlewareList;
         public HttpManager(IHttpRequestReader requestReader, ServerOptions options, ICollection<IMiddleware> middleware)
         {
-            _options = options;
-            _httpRequestReader = requestReader;
-            _middlewareList = middleware;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _httpRequestReader = requestReader ?? throw new ArgumentNullException(nameof(requestReader));
+            _middlewareList = middleware ?? throw new ArgumentNullException(nameof(middleware));
         }
         public void Manage(IClient client)
         {

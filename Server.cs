@@ -1,9 +1,7 @@
 ﻿using System.Threading;
 using WebServer.Clients;
-using WebServer.DI;
 using WebServer.DI.Interfaces;
 using WebServer.Listeners;
-using WebServer.Service;
 using WebServer.Service.Interfaces;
 
 namespace WebServer

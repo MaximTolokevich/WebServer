@@ -1,4 +1,6 @@
-﻿namespace WebServer.DI.Interfaces
+﻿using System.Collections.Generic;
+
+namespace WebServer.DI.Interfaces
 {
     public interface IServiceCollection
     {
@@ -16,5 +18,6 @@
         void Add(object obj);
         void Add<TInterface>(object obj, string name);
         void Add<TInterface>(object obj);
+        MyContainer BuildContainer();
     }
 }

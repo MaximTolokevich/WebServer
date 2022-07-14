@@ -2,8 +2,8 @@
 using WebServer.Clients;
 using WebServer.DI;
 using WebServer.DI.Interfaces;
+using WebServer.DI.JSONSerializer;
 using WebServer.HttpRequestReaders;
-using WebServer.JSONSerializer;
 using WebServer.Listeners;
 using WebServer.Middlewares;
 using WebServer.Middlewares.Interfaces;
@@ -29,45 +29,45 @@ namespace WebServer
 
             var col = new MyServiceCollection();
             //registering dependencies of the first server
-            col.AddSingletonWithName<IServer, Server>(firstServer);
-            col.AddSingletonWithName<IListener, TcpListenerAdapter>(firstServer);
-            col.AddSingletonWithName<CookieStorage>(firstServer);
-            col.AddSingletonWithName<IMiddleware, CookieMiddleware>(firstServer);
-            col.AddWithName(firstSetting, firstServer);
+            //col.AddSingletonWithName<IServer, Server>(firstServer);
+            //col.AddSingletonWithName<IListener, TcpListenerAdapter>(firstServer);
+            //col.AddSingletonWithName<CookieStorage>(firstServer);
+            //col.AddSingletonWithName<IMiddleware, CookieMiddleware>(firstServer);
+            //col.AddWithName(firstSetting, firstServer);
 
-            col.AddTransientWithName<IManager, HttpManager>(firstServer);
-            col.AddTransientWithName<ICookieGenerator, CookieGenerator>(firstServer);
-            col.AddTransientWithName<IHttpRequestReader,HttpRequestReader>(firstServer);
-
-            //registering dependencies of the second server
-            col.AddSingletonWithName<IServer, Server>(secondServer);
-            col.AddSingletonWithName<IListener, TcpListenerAdapter>(secondServer);
-            col.AddSingletonWithName<CookieStorage>(secondServer);
-            col.AddSingletonWithName<IMiddleware, CookieMiddleware>(secondServer);
-            col.AddWithName(secondSetting, secondServer);
-
-            col.AddTransientWithName<IManager, HttpManager>(secondServer);
-            col.AddTransientWithName<ICookieGenerator, CookieGenerator>(secondServer);
-            col.AddTransientWithName<IHttpRequestReader, HttpRequestReader>(secondServer);
-
+            //col.AddTransientWithName<IManager, HttpManager>(firstServer);
+            //col.AddTransientWithName<ICookieGenerator, CookieGenerator>(firstServer);
+            //col.AddTransientWithName<IHttpRequestReader,HttpRequestReader>(firstServer);
+            DependencyRegistrar.DependencyRegistrar.AddConfig<ServerOptions>(col, "C:\\Users\\Trolo\\source\\repos\\WebServer\\Config\\jsconfig2.json",secondServer);
+            DependencyRegistrar.DependencyRegistrar.RegisterServerDependencies(col,secondServer);
             var container = col.BuildContainer();
+            //registering dependencies of the second server
+            //col.AddSingletonWithName<IServer, Server>(secondServer);
+            //col.AddSingletonWithName<IListener, TcpListenerAdapter>(secondServer);
+            //col.AddSingletonWithName<CookieStorage>(secondServer);
+            //col.AddSingletonWithName<IMiddleware, CookieMiddleware>(secondServer);
+            //col.AddWithName(secondSetting, secondServer);
 
-            col.AddWithName<ICollection<IMiddleware>>(BuildMiddleware(container, firstSetting), firstServer);
-            col.AddWithName<IDIContainer>(container, firstServer);
+            //col.AddTransientWithName<IManager, HttpManager>(secondServer);
+            //col.AddTransientWithName<ICookieGenerator, CookieGenerator>(secondServer);
+            //col.AddTransientWithName<IHttpRequestReader, HttpRequestReader>(secondServer);
 
-            col.AddWithName<ICollection<IMiddleware>>(BuildMiddleware(container, secondSetting), secondServer);
-            col.AddWithName<IDIContainer>(container, secondServer);
+            //var container = col.BuildContainer();
 
-            var server = container.GetService<IServer>(firstServer);
+            //col.AddWithName<ICollection<IMiddleware>>(BuildMiddleware(container, firstSetting), firstServer);
+            //col.AddWithName<IDIContainer>(container, firstServer);
+
+            //col.AddWithName<ICollection<IMiddleware>>(BuildMiddleware(container, secondSetting), secondServer);
+            //col.AddWithName<IDIContainer>(container, secondServer);
+
+            var server = container.GetService<IServer>(secondServer);
             server.Start();
-            var server2 = container.GetService<IServer>(secondServer);
-            server2.Start();
+            //var server2 = container.GetService<IServer>(secondServer);
+            //server2.Start();
 
         }
 
-        
-        
-        private static ICollection<IMiddleware> BuildMiddleware(MyContainer container,ServerOptions options)
+        private static ICollection<IMiddleware> BuildMiddleware(IDIContainer container,ServerOptions options)
         { 
             var list = new MiddlewareList().GetMiddlewares();
             list.Add(container.GetService<IMiddleware>(options.DependencyGroupName));

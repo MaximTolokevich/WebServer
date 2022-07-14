@@ -36,7 +36,7 @@ namespace WebServer.Middlewares
             {
                 context.HttpResponse.Body = Encoding.UTF8.GetBytes(string.Format(_template, string.Empty));
                 const long visit = 1;
-                context.HttpResponse.CookieList.Add($" {Guid.NewGuid()}={_cookieGenerator.GenerateCookie()}");
+                context.HttpResponse.CookieList.Add(_cookieGenerator.GenerateCookie());
                 foreach (var item in context.HttpResponse.CookieList)
                 {
                     _cookieStorage.CookieDictionary.TryAdd(item, visit);
