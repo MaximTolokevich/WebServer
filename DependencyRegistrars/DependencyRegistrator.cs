@@ -11,39 +11,32 @@ using WebServer.Service;
 using WebServer.Service.Interfaces;
 using WebServer.Storage;
 
-namespace WebServer.DependencyRegistrar
+namespace WebServer.DependencyRegistrars
 {
     public static class DependencyRegistrar
     {
-        public static void RegisterServerDependencies(IServiceCollection collection)
+        public static void RegisterHttpServerDependencies(IServiceCollection collection)
         {
             collection.AddSingleton<IServer, Server>();
             collection.AddSingleton<IListener, TcpListenerAdapter>();
-            collection.AddSingleton<CookieStorage>();
 
-            collection.AddTransient<IMiddleware, CookieMiddleware>();
             collection.AddTransient<IManager, HttpManager>();
-            collection.AddTransient<ICookieGenerator, CookieGenerator>();
+            
             collection.AddTransient<IHttpRequestReader, HttpRequestReader>();
             var container = collection.BuildContainer();
-            collection.AddTransient<IMiddlewareBuilder, MiddlewareBuilder>();
+
             collection.Add<IDIContainer>(container);
         }
-        public static void RegisterServerDependencies(IServiceCollection collection, string name)
+        public static void RegisterHttpServerDependencies(IServiceCollection collection, string name)
         {
             collection.AddSingletonWithName<IServer, Server>(name);
             collection.AddSingletonWithName<IListener, TcpListenerAdapter>(name);
-            collection.AddSingletonWithName<CookieStorage>(name);
 
-            collection.AddTransientWithName<IMiddleware, CookieMiddleware>(name);
             collection.AddTransientWithName<IManager, HttpManager>(name);
-            collection.AddTransientWithName<ICookieGenerator, CookieGenerator>(name);
+            
             collection.AddTransientWithName<IHttpRequestReader, HttpRequestReader>(name);
             var container = collection.BuildContainer();
-            collection.AddTransientWithName<IMiddlewareBuilder,MiddlewareBuilder>(name);
-            var middleware = container.GetService<IMiddlewareBuilder>()
-                .BuildMiddleware(container, container.GetService<ServerOptions>(name));
-                collection.Add<ICollection<IMiddleware>>(middleware,name);
+
             collection.AddWithName<IDIContainer>(container, name);
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using WebServer.Clients;
+using WebServer.DI.Interfaces;
 using WebServer.HttpRequestReaders;
 using WebServer.Middlewares.Interfaces;
 using WebServer.Models;
@@ -12,12 +13,12 @@ namespace WebServer.Service
     {
         private readonly IHttpRequestReader _httpRequestReader;
         private readonly ServerOptions _options;
-        private readonly ICollection<IMiddleware> _middlewareList;
-        public HttpManager(IHttpRequestReader requestReader, ServerOptions options, ICollection<IMiddleware> middleware)
+        private readonly IDIContainer _container;
+        public HttpManager(IHttpRequestReader requestReader, ServerOptions options, IDIContainer container)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _httpRequestReader = requestReader ?? throw new ArgumentNullException(nameof(requestReader));
-            _middlewareList = middleware ?? throw new ArgumentNullException(nameof(middleware));
+            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
         public void Manage(IClient client)
         {
@@ -31,7 +32,11 @@ namespace WebServer.Service
 
                 httpContext.HttpRequest.Headers.Add("IPAddress", client.GetClientInfo().ToString());
 
-                foreach (var item in _middlewareList)
+                var middlewareList = _options.DependencyGroupName is null ? 
+                    _container.GetService<ICollection<IMiddleware>>() :
+                    _container.GetService<ICollection<IMiddleware>>(_options.DependencyGroupName);
+
+                foreach (var item in middlewareList)
                 {
                     item.Invoke(httpContext);
                 }

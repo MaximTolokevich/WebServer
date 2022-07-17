@@ -14,9 +14,7 @@ namespace WebServer.DI.Interfaces
         void AddTransient<T>();
         void AddSingleton<T, V>();
         void AddSingleton<T>();
-        void Add(object obj, string name);
         void Add(object obj);
-        void Add<TInterface>(object obj, string name);
         void Add<TInterface>(object obj);
         MyContainer BuildContainer();
     }

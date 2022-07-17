@@ -13,11 +13,6 @@ namespace WebServer.DI
             CheckIsInterfaceType(typeof(TInterface));
             _serviceProviders.Add(new MyServiceProvider(obj, typeof(TInterface)));
         }
-        public void Add<TInterface>(object obj, string name)
-        {
-            CheckIsInterfaceType(typeof(TInterface));
-            _serviceProviders.Add(new MyServiceProvider(obj, typeof(TInterface), name));
-        }
         public void Add(object obj)
         {
             _serviceProviders.Add(new MyServiceProvider(obj));

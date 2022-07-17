@@ -48,7 +48,7 @@ namespace WebServer.Models
             
             for (var i = 1; i < splitedRequest.Length; i++)
             {
-                var headerElement = splitedRequest[i].Split(':');
+                var headerElement = splitedRequest[i].Split(": ");
                 headers.Add(headerElement[0], string.Join(null, headerElement[1..]));
             }
 

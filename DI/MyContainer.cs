@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WebServer.DI.Exceptions;
 using WebServer.DI.Interfaces;
+using WebServer.Middlewares.Interfaces;
 
 namespace WebServer.DI
 {
@@ -17,6 +18,28 @@ namespace WebServer.DI
 
         private object GetService(Type serviceType)
         {
+            if (serviceType == typeof(ICollection<IMiddleware>))
+            {
+                var providers = _serviceProviders.Where(x =>
+                    x.InterfaceType == typeof(IMiddleware) && x.DependencyName is null);
+                var collection = new List<IMiddleware>();
+                foreach (var item in providers)
+                {
+                    if (item.Implementation is not null)
+                    {
+                        return item.Implementation;
+                    }
+                    var constructParam = GetConstructorParameters(item);
+                    var impl = CreateInstance(item.ImplType, constructParam);
+                    if (item.LifeTime == ServiceLifeTime.Singleton)
+                    {
+                        item.Implementation = impl;
+                    }
+                    collection.Add((IMiddleware)impl);
+                }
+
+                return collection;
+            }
             if (serviceType.IsInterface)
             {
                 var provider = _serviceProviders.LastOrDefault(x => x.InterfaceType == serviceType);
@@ -64,6 +87,28 @@ namespace WebServer.DI
         }
         private object GetService(Type serviceType, string name)
         {
+            if (serviceType == typeof(ICollection<IMiddleware>))
+            {
+                var providers = _serviceProviders.Where(x =>
+                    x.InterfaceType == typeof(IMiddleware) && x.DependencyName.Equals(name));
+                var collection = new List<IMiddleware>();
+                foreach (var item in providers)
+                {
+                    if (item.Implementation is not null)
+                    {
+                        return item.Implementation;
+                    }
+                    var constructParam = GetConstructorParameters(item, name);
+                    var impl = CreateInstance(item.ImplType, constructParam);
+                    if (item.LifeTime == ServiceLifeTime.Singleton)
+                    {
+                        item.Implementation = impl;
+                    }
+                    collection.Add((IMiddleware)impl);
+                }
+
+                return collection;
+            }
             if (serviceType.IsInterface)
             {
                 var provider = _serviceProviders.LastOrDefault(x => x.InterfaceType == serviceType && x.DependencyName.Equals(name));
@@ -127,14 +172,14 @@ namespace WebServer.DI
             return Activator.CreateInstance(type, param.ToArray());
         }
 
-        private void CheckProviderExist(MyServiceProvider provider, Type type)
+        private static void CheckProviderExist(MyServiceProvider provider, Type type)
         {
             if (provider is null)
             {
                 throw new DependencyNotRegisteredException($"Dependency of type{type} not registered");
             }
         }
-        private void CheckProviderWithNameExist(MyServiceProvider provider, Type type, string name)
+        private static void CheckProviderWithNameExist(MyServiceProvider provider, Type type, string name)
         {
             if (provider is null)
             {
