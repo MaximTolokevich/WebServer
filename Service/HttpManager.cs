@@ -33,7 +33,7 @@ namespace WebServer.Service
                 httpContext.HttpRequest.Headers.Add("IPAddress", client.GetClientInfo().ToString());
 
                 var middlewareList = _options.DependencyGroupName is null ? 
-                    _container.GetService<ICollection<IMiddleware>>() :
+                    _container.GetService<ICollection<IMiddleware>>(null) :
                     _container.GetService<ICollection<IMiddleware>>(_options.DependencyGroupName);
 
                 foreach (var item in middlewareList)

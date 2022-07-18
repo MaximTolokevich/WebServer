@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using WebServer.DI.Interfaces;
 
 namespace WebServer.DI
 {
-    public class MyServiceCollection:IServiceCollection
+    public class MyServiceCollection : IServiceCollection
     {
         private readonly List<MyServiceProvider> _serviceProviders = new();
 
         public void Add<TInterface>(object obj)
         {
-            CheckIsInterfaceType(typeof(TInterface));
+            CheckIsInterfaceType(typeof(TInterface), obj.GetType());
             _serviceProviders.Add(new MyServiceProvider(obj, typeof(TInterface)));
         }
         public void Add(object obj)
@@ -29,8 +30,8 @@ namespace WebServer.DI
         }
         public void AddSingleton<TInterface, TImplementation>()
         {
-            CheckIsInterfaceType(typeof(TInterface));
             CheckIsConcreteClassType(typeof(TImplementation));
+            CheckIsInterfaceType(typeof(TInterface), typeof(TImplementation));
             _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Singleton));
         }
 
@@ -42,13 +43,13 @@ namespace WebServer.DI
 
         public void AddTransient<TInterface, TImplementation>()
         {
-            CheckIsInterfaceType(typeof(TInterface));
             CheckIsConcreteClassType(typeof(TImplementation));
+            CheckIsInterfaceType(typeof(TInterface), typeof(TImplementation));
             _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Transient));
         }
         public void AddWithName<TInterface>(object obj, string name)
         {
-            CheckIsInterfaceType(typeof(TInterface));
+            CheckIsInterfaceType(typeof(TInterface), obj.GetType());
             _serviceProviders.Add(new MyServiceProvider(obj, typeof(TInterface), name));
         }
         public void AddWithName(object obj, string name)
@@ -63,8 +64,8 @@ namespace WebServer.DI
         }
         public void AddSingletonWithName<TInterface, TImplementation>(string name)
         {
-            CheckIsInterfaceType(typeof(TInterface));
             CheckIsConcreteClassType(typeof(TImplementation));
+            CheckIsInterfaceType(typeof(TInterface), typeof(TImplementation));
             _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Singleton, name));
         }
 
@@ -76,21 +77,27 @@ namespace WebServer.DI
 
         public void AddTransientWithName<TInterface, TImplementation>(string name)
         {
-            CheckIsInterfaceType(typeof(TInterface));
             CheckIsConcreteClassType(typeof(TImplementation));
+            CheckIsInterfaceType(typeof(TInterface), typeof(TImplementation));
             _serviceProviders.Add(new MyServiceProvider(typeof(TInterface), typeof(TImplementation), ServiceLifeTime.Transient, name));
         }
 
-        private static void CheckIsInterfaceType(Type type)
+        private static void CheckIsInterfaceType(Type type, Type objType)
         {
             if (!type.IsInterface)
             {
                 throw new ArgumentException("Should be Interface type", nameof(type));
             }
+
+            var interfaces = objType.GetInterfaces();
+            if (interfaces.All(x => x != type))
+            {
+                throw new ArgumentException($"{objType} not implement {type}");
+            }
         }
         private static void CheckIsConcreteClassType(Type type)
         {
-            if (!type.IsClass || type.IsAbstract || type.IsEnum)
+            if (!type.IsClass || type.IsAbstract)
             {
                 throw new ArgumentException("Should be concrete class type", nameof(type));
             }

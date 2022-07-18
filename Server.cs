@@ -59,7 +59,7 @@ namespace WebServer
 
             if (_options.DependencyGroupName is null)
             {
-                _container.GetService<IManager>().Manage(client);
+                _container.GetService<IManager>(null).Manage(client);
             }
             else
             {

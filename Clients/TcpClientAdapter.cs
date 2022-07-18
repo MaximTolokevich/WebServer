@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
@@ -12,8 +12,8 @@ namespace WebServer.Clients
         private bool _disposedValue;
         public TcpClientAdapter(TcpClient client, ServerOptions options)
         {
-            _tcpClient = client;
-            _options = options;
+            _tcpClient = client ?? throw new ArgumentNullException(nameof(client), "can't be null");
+            _options = options ?? throw new ArgumentNullException(nameof(options), "can't be null");
         }
 
 
@@ -44,16 +44,17 @@ namespace WebServer.Clients
         {
             var stream = _tcpClient.GetStream();
             var buffer = new byte[8192];
-            var data = new List<byte>();
             stream.ReadTimeout = _options.ReadTimeOut;
+            using var memoryStream = new MemoryStream();
             do
             {
                 var dataLength = stream.Read(buffer, 0, buffer.Length);
-                data.AddRange(buffer[..dataLength]);
-                Array.Clear(buffer,0,buffer.Length);
+                memoryStream.Write(buffer, 0, dataLength);
+                Array.Clear(buffer, 0, buffer.Length);
             } while (stream.DataAvailable);
 
-            return data.ToArray();
+
+            return memoryStream.ToArray();
         }
 
         public void SendResponse(byte[] data)

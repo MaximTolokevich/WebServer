@@ -37,7 +37,7 @@ namespace WebServer.Listeners
             {
                 try
                 {
-                    return new TcpClientAdapter(_tcpListener.AcceptTcpClient(),_options);
+                    return new TcpClientAdapter(_tcpListener.AcceptTcpClient(), _options);
                 }
                 catch (SocketException e)
                 {

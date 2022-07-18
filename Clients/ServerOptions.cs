@@ -9,10 +9,5 @@
         public string DependencyGroupName { get; set; }
         public (int,int) SetMaxThreads { get; set; }
         public (int,int) SetMinThreads { get; set; }
-
-        public ServerOptions()
-        {
-
-        }
     }
 }
