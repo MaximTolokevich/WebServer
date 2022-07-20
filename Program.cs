@@ -1,6 +1,6 @@
-﻿using WebServer.Clients;
+﻿using MyDi.DI;
+using WebServer.Clients;
 using WebServer.DependencyRegistrars;
-using WebServer.DI;
 using WebServer.Middlewares;
 using WebServer.Middlewares.Interfaces;
 using WebServer.Service;
@@ -19,28 +19,26 @@ namespace WebServer
 
             var col = new MyServiceCollection();
 
-            col.AddSingletonWithName<CookieStorage>(firstServer);
-            col.AddTransientWithName<ICookieGenerator, CookieGenerator>(firstServer);
+            col.AddSingleton<CookieStorage>(firstServer);
+            col.AddTransient<ICookieGenerator, CookieGenerator>(firstServer);
 
-            col.AddSingletonWithName<CookieStorage>(secondServer);
-            col.AddTransientWithName<ICookieGenerator, CookieGenerator>(secondServer);
+            col.AddSingleton<CookieStorage>(secondServer);
+            col.AddTransient<ICookieGenerator, CookieGenerator>(secondServer);
 
-            col.AddTransientWithName<IMiddleware, CookieMiddleware>(firstServer);
-            col.AddTransientWithName<IMiddleware, CookieMiddleware>(secondServer);
+            col.AddTransient<IMiddleware, CookieMiddleware>(firstServer);
+            col.AddTransient<IMiddleware, CookieMiddleware>(secondServer);
 
-            DependencyRegistrar.AddConfig<ServerOptions>(col, "C:\\Users\\Trolo\\source\\repos\\WebServer\\Config\\jsconfig1.json", firstServer);
+            DependencyRegistrar.AddConfig<ServerOptions>(col, "C:\\Users\\Trolo\\Source\\Repos\\MaximTolokevich\\WebServer\\Config\\jsconfig1.json", firstServer);
             DependencyRegistrar.RegisterHttpServerDependencies(col, firstServer);
 
-            DependencyRegistrar.AddConfig<ServerOptions>(col, "C:\\Users\\Trolo\\source\\repos\\WebServer\\Config\\jsconfig2.json", secondServer);
+            DependencyRegistrar.AddConfig<ServerOptions>(col, "C:\\Users\\Trolo\\Source\\Repos\\MaximTolokevich\\WebServer\\Config\\jsconfig2.json", secondServer);
             DependencyRegistrar.RegisterHttpServerDependencies(col, secondServer);
 
             var container = col.BuildContainer();
-
             var server = container.GetService<IServer>(firstServer);
             server.Start();
             var server2 = container.GetService<IServer>(secondServer);
             server2.Start();
-
         }
     }
 }

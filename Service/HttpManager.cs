@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using WebServer.Clients;
-using WebServer.DI.Interfaces;
+using WebServer.Exceptions;
 using WebServer.HttpRequestReaders;
 using WebServer.Middlewares.Interfaces;
 using WebServer.Models;
@@ -13,12 +15,12 @@ namespace WebServer.Service
     {
         private readonly IHttpRequestReader _httpRequestReader;
         private readonly ServerOptions _options;
-        private readonly IDIContainer _container;
-        public HttpManager(IHttpRequestReader requestReader, ServerOptions options, IDIContainer container)
+        private readonly ICollection<IMiddleware> _middlewares;
+        public HttpManager(IHttpRequestReader requestReader, ServerOptions options, ICollection<IMiddleware> middleware)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _httpRequestReader = requestReader ?? throw new ArgumentNullException(nameof(requestReader));
-            _container = container ?? throw new ArgumentNullException(nameof(container));
+            _middlewares = middleware ?? throw new ArgumentNullException(nameof(middleware));
         }
         public void Manage(IClient client)
         {
@@ -32,16 +34,21 @@ namespace WebServer.Service
 
                 httpContext.HttpRequest.Headers.Add("IPAddress", client.GetClientInfo().ToString());
 
-                var middlewareList = _options.DependencyGroupName is null ? 
-                    _container.GetService<ICollection<IMiddleware>>(null) :
-                    _container.GetService<ICollection<IMiddleware>>(_options.DependencyGroupName);
 
-                foreach (var item in middlewareList)
+                foreach (var item in _middlewares)
                 {
                     item.Invoke(httpContext);
                 }
 
                 client.SendResponse(httpContext.HttpResponse.Build());
+            }
+            catch (InvalidRequestException e)
+            {
+                client.SendResponse(Encoding.UTF8.GetBytes(e.Message));
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e);
             }
             catch (Exception e)
             {

@@ -4,12 +4,8 @@
   "Port": 9090,
   "IpAddress": "127.0.0.1",
   "DependencyGroupName": "SecondServer",
-  "SetMaxThreads": {
-    "workerThreads": 8,
-    "completionPortThreads": 8
-  },
-  "SetMinThreads": {
-    "workerThreads": 8,
-    "completionPortThreads": 8
-  }
+  "WorkerThreadsMax": 5,
+  "CompletionPortThreadsMax": 5,
+  "WorkerThreadsMin": 5,
+  "CompletionPortThreadsMin": 5
 }

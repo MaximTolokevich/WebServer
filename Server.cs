@@ -1,6 +1,6 @@
-﻿using System.Threading;
+﻿using MyDi.DI.Interfaces;
+using System.Threading;
 using WebServer.Clients;
-using WebServer.DI.Interfaces;
 using WebServer.Listeners;
 using WebServer.Service.Interfaces;
 
@@ -36,14 +36,27 @@ namespace WebServer
 
             SpinWait.SpinUntil(() =>
             {
+                if (_options is not null)
+                {
+                    if (_options.WorkerThreadsMax != 0 &&
+                        _options.CompletionPortThreadsMax != 0)
+                    {
+                        ThreadPool.SetMaxThreads(_options.WorkerThreadsMax,
+                            _options.CompletionPortThreadsMax);
+                    }
+
+                    if (_options.WorkerThreadsMin != 0 &&
+                        _options.CompletionPortThreadsMin != 0)
+                    {
+                        ThreadPool.SetMinThreads(_options.WorkerThreadsMin,
+                            _options.CompletionPortThreadsMin);
+                    }
+                }
+
                 client = _listener.AcceptClient();
                 if (client is not null)
                 {
-                    if (_options is not null)
-                    {
-                        ThreadPool.SetMinThreads(_options.SetMinThreads.Item1, _options.SetMinThreads.Item2);
-                        ThreadPool.SetMaxThreads(_options.SetMaxThreads.Item1, _options.SetMaxThreads.Item2);
-                    }
+                    
                     ThreadPool.QueueUserWorkItem(HandleClient, client);
                 }
 
