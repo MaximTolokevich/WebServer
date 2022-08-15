@@ -1,10 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
-<<<<<<< HEAD:WebServer/Middlewares/CookieMiddleware.cs
 using WebServer.Extensions;
-=======
->>>>>>> b685f0ae43cb09228e56e2cc1fc49f7a32a3ca5b:Middlewares/CookieMiddleware.cs
 using WebServer.Middlewares.Interfaces;
 using WebServer.Models;
 using WebServer.Service.Interfaces;
@@ -18,7 +15,7 @@ namespace WebServer.Middlewares
         private readonly CookieStorage _cookieStorage;
 
         private readonly string _template =
-            File.ReadAllText("C:\\Users\\Trolo\\source\\repos\\WebServer\\ResponseBody.html");
+            File.ReadAllText(@"C:\Users\Trolo\Source\Repos\WebServer\WebServer\ResponseBody.html");
 
         public CookieMiddleware(ICookieGenerator cookieGenerator, CookieStorage storage)
         {
