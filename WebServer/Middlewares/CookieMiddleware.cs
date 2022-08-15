@@ -1,7 +1,10 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
+<<<<<<< HEAD:WebServer/Middlewares/CookieMiddleware.cs
 using WebServer.Extensions;
+=======
+>>>>>>> b685f0ae43cb09228e56e2cc1fc49f7a32a3ca5b:Middlewares/CookieMiddleware.cs
 using WebServer.Middlewares.Interfaces;
 using WebServer.Models;
 using WebServer.Service.Interfaces;

@@ -1,0 +1,11 @@
+{
+  "ServerName": "FirstServer",
+  "ReadTimeOut": 500,
+  "Port": 8080,
+  "IpAddress": "127.0.0.1",
+  "DependencyGroupName": "FirstServer",
+  "WorkerThreadsMax": 4,
+  "CompletionPortThreadsMax": 4,
+  "WorkerThreadsMin": 4,
+  "CompletionPortThreadsMin": 4
+}
