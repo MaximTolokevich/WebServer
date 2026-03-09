@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using MyDi.DI;
+﻿using MyDi.DI;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using WebServer.Clients;
 using WebServer.DependencyRegistrars;
 using WebServer.Middlewares;
@@ -28,10 +30,14 @@ namespace WebServer
             col.AddTransient<IMiddleware, CookieMiddleware>();
             col.AddTransient<IMiddleware, CookieMiddleware>(secondServer);
 
-            col.AddConfig<ServerOptions>("C:\\Users\\Trolo\\Source\\Repos\\Education\\WebServer\\Config\\jsconfig1.json");
-            col.RegisterHttpServerDependencies();
+            var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
 
-            col.AddConfig<ServerOptions>("C:\\Users\\Trolo\\Source\\Repos\\Education\\WebServer\\Config\\jsconfig2.json", secondServer);
+            var config1 = Path.Combine(projectRoot, "Config", "jsconfig1.json");
+            var config2 = Path.Combine(projectRoot, "Config", "jsconfig2.json");
+
+            col.AddConfig<ServerOptions>(config1);
+            col.RegisterHttpServerDependencies();
+            col.AddConfig<ServerOptions>(config2, secondServer);
             col.RegisterHttpServerDependencies(secondServer);
 
             var container = col.BuildContainer();
